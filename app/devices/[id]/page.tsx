@@ -254,7 +254,7 @@ export default function DeviceDetailPage() {
                   </div>
                   <div>
                     <p className="text-xs text-slate-500 mb-1">Sinusoidality</p>
-                    {dailyMetric["sinusoidality_pass_<=5pct"] ? (
+                    {dailyMetric["sinusoidality_pass_<=30pct"] ? (
                       <Badge variant="success">Pass</Badge>
                     ) : (
                       <Badge variant="warning">Fail</Badge>
