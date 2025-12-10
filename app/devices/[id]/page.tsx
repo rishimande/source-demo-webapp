@@ -82,7 +82,7 @@ export default function DeviceDetailPage() {
   
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Back Button */}
       <Link
         href="/devices"
@@ -93,22 +93,22 @@ export default function DeviceDetailPage() {
       </Link>
       
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-800">{DEVICE_NAME}</h1>
-          <p className="text-slate-500 mt-1">ID: {deviceId}</p>
-          <p className="text-sm text-slate-500 mt-1">
+      <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-3 sm:gap-0">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-800 break-words">{DEVICE_NAME}</h1>
+          <p className="text-sm sm:text-base text-slate-500 mt-1 break-all">ID: {deviceId}</p>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Data period: {dataPeriod.min} – {dataPeriod.max}
           </p>
         </div>
         
-        <div>
+        <div className="flex-shrink-0">
           {verificationStatus === 'verified' ? (
-            <Badge variant="success" className="text-sm px-3 py-1">
+            <Badge variant="success" className="text-xs sm:text-sm px-2 sm:px-3 py-1">
               Source Verified
             </Badge>
           ) : (
-            <Badge variant="warning" className="text-sm px-3 py-1">
+            <Badge variant="warning" className="text-xs sm:text-sm px-2 sm:px-3 py-1">
               Needs Review
             </Badge>
           )}
@@ -116,7 +116,7 @@ export default function DeviceDetailPage() {
       </div>
       
       {/* Summary Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {/* Generation Profile */}
         <Card>
           <CardHeader>
@@ -195,30 +195,39 @@ export default function DeviceDetailPage() {
       </div>
       
       {/* Tabs */}
-      <Tabs defaultValue="daily" className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="daily">Daily Power</TabsTrigger>
-          <TabsTrigger value="envelope">7-Day Envelope</TabsTrigger>
-          <TabsTrigger value="diagnostics">Verification Diagnostics</TabsTrigger>
+      <Tabs defaultValue="daily" className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="daily" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+            <span className="hidden sm:inline">Daily Power</span>
+            <span className="sm:hidden">Daily</span>
+          </TabsTrigger>
+          <TabsTrigger value="envelope" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+            <span className="hidden sm:inline">7-Day Envelope</span>
+            <span className="sm:hidden">7-Day</span>
+          </TabsTrigger>
+          <TabsTrigger value="diagnostics" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+            <span className="hidden sm:inline">Verification Diagnostics</span>
+            <span className="sm:hidden">Verify</span>
+          </TabsTrigger>
         </TabsList>
         
         {/* Tab 1: Daily Power */}
-        <TabsContent value="daily" className="space-y-6">
+        <TabsContent value="daily" className="space-y-4 sm:space-y-6">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Daily Power Curve</CardTitle>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <CardTitle className="text-base sm:text-lg">Daily Power Curve</CardTitle>
                 <select
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="rounded-lg border border-slate-300 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 w-full sm:w-auto"
                 >
                   {allDates.slice().reverse().map(date => (
                     <option key={date} value={date}>{date}</option>
                   ))}
                 </select>
               </div>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 Power generation vs local time (6:00 – 18:00)
               </CardDescription>
             </CardHeader>
@@ -240,10 +249,10 @@ export default function DeviceDetailPage() {
           {dailyMetric && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Day Summary – {selectedDate}</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Day Summary – {selectedDate}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                   <div>
                     <p className="text-xs text-slate-500 mb-1">Max Power</p>
                     <p className="font-semibold text-slate-800">{maxPower.toFixed(1)} W</p>
@@ -283,7 +292,7 @@ export default function DeviceDetailPage() {
         </TabsContent>
         
         {/* Tab 2: 7-Day Envelope */}
-        <TabsContent value="envelope" className="space-y-6">
+        <TabsContent value="envelope" className="space-y-6 sm:space-y-8">
           {sevenDayWindows.map((window, index) => {
             const windowMetrics = getMetricsForWindow(window.start, window.end);
             const envelopeData = calculateSevenDayEnvelope(window.start, window.end);
@@ -305,12 +314,12 @@ export default function DeviceDetailPage() {
             };
             
             return (
-              <div key={`${window.start}-${window.end}`} className="grid gap-6 lg:grid-cols-2">
+              <div key={`${window.start}-${window.end}`} className="grid gap-4 sm:gap-6 lg:grid-cols-2">
                 {/* Chart */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>7-Day Envelope + Half-Sine Fit</CardTitle>
-                    <CardDescription>{window.start} to {window.end}</CardDescription>
+                    <CardTitle className="text-base sm:text-lg">7-Day Envelope + Half-Sine Fit</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">{window.start} to {window.end}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <SevenDayEnvelopeChart
@@ -327,8 +336,8 @@ export default function DeviceDetailPage() {
                 {/* Window Info */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Window Metrics</CardTitle>
-                    <CardDescription>Aggregated statistics for this 7-day window</CardDescription>
+                    <CardTitle className="text-base sm:text-lg">Window Metrics</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">Aggregated statistics for this 7-day window</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -383,11 +392,11 @@ export default function DeviceDetailPage() {
         </TabsContent>
         
         {/* Tab 3: Verification Diagnostics */}
-        <TabsContent value="diagnostics" className="space-y-6">
+        <TabsContent value="diagnostics" className="space-y-4 sm:space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Per-Day Verification Rules</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-base sm:text-lg">Per-Day Verification Rules</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 Detailed diagnostics for each day in the analysis period
               </CardDescription>
             </CardHeader>

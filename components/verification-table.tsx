@@ -40,19 +40,19 @@ export function VerificationTable({ metrics }: VerificationTableProps) {
   return (
     <div className="space-y-4">
       {/* Legend and Filter */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+        <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <span className="text-emerald-600">✓</span>
-            <span className="text-slate-600">Passes rule</span>
+            <span className="text-slate-600">Passes</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <span className="text-red-600">✗</span>
-            <span className="text-slate-600">Fails rule</span>
+            <span className="text-slate-600">Fails</span>
           </div>
         </div>
         
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 text-xs sm:text-sm">
           <input
             type="checkbox"
             checked={showFailingOnly}
@@ -64,74 +64,74 @@ export function VerificationTable({ metrics }: VerificationTableProps) {
       </div>
       
       {/* Table */}
-      <div className="rounded-lg border">
-        <Table>
+      <div className="rounded-lg border overflow-x-auto">
+        <Table className="min-w-[800px]">
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Sinusoidality NRMSE</TableHead>
-              <TableHead>Sinusoidality Pass</TableHead>
-              <TableHead>Frac Above Model</TableHead>
-              <TableHead>Negative Noise Pass</TableHead>
-              <TableHead>Frac Low Outside</TableHead>
-              <TableHead>No-Gen Pass</TableHead>
-              <TableHead>Lambda</TableHead>
-              <TableHead>Battery Dip</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">Date</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">Sinusoidality NRMSE</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">Sinusoidality Pass</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">Frac Above Model</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">Negative Noise Pass</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">Frac Low Outside</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">No-Gen Pass</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">Lambda</TableHead>
+              <TableHead className="whitespace-nowrap text-xs sm:text-sm">Battery Dip</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredMetrics.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-slate-500 py-8">
+                <TableCell colSpan={9} className="text-center text-slate-500 py-8 text-xs sm:text-sm">
                   {showFailingOnly ? 'No failing days found' : 'No data available'}
                 </TableCell>
               </TableRow>
             ) : (
               filteredMetrics.map((metric) => (
                 <TableRow key={metric.date}>
-                  <TableCell className="font-medium">{metric.date}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{metric.date}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     {metric.sinusoidality_nrmse !== null 
                       ? (metric.sinusoidality_nrmse * 100).toFixed(2) + '%'
                       : '—'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     {metric["sinusoidality_pass_<=30pct"] ? (
                       <span className="text-emerald-600 font-semibold">✓</span>
                     ) : (
                       <span className="text-red-600 font-semibold">✗</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     {metric.frac_points_obs_gt_model_plus_5pct !== null 
                       ? (metric.frac_points_obs_gt_model_plus_5pct * 100).toFixed(2) + '%'
                       : '—'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     {metric["negative_noise_pass_<=5pct_violations"] ? (
                       <span className="text-emerald-600 font-semibold">✓</span>
                     ) : (
                       <span className="text-red-600 font-semibold">✗</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     {metric.fraction_low_power_outside_daylight !== null 
                       ? (metric.fraction_low_power_outside_daylight * 100).toFixed(2) + '%'
                       : '—'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     {metric["no_generation_outside_daylight_pass_>=95pct"] ? (
                       <span className="text-emerald-600 font-semibold">✓</span>
                     ) : (
                       <span className="text-red-600 font-semibold">✗</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     {metric.lambda_day !== null 
                       ? metric.lambda_day.toFixed(4)
                       : '—'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm whitespace-nowrap">
                     {formatBatteryDipTime(metric.detected_battery_dip)}
                   </TableCell>
                 </TableRow>

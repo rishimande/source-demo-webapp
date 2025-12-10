@@ -32,19 +32,21 @@ export function DailyPowerChart({ samples, batteryDipTime }: DailyPowerChartProp
   }
   
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+    <ResponsiveContainer width="100%" height={300} className="sm:!h-[400px]">
+      <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
         <XAxis 
           dataKey="localHour" 
-          label={{ value: 'Local Time (Hour)', position: 'insideBottom', offset: -5 }}
+          label={{ value: 'Local Time (Hour)', position: 'insideBottom', offset: -5, style: { fontSize: '12px' } }}
           domain={[6, 18]}
-          ticks={[6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]}
+          ticks={[6, 8, 10, 12, 14, 16, 18]}
           stroke="#64748b"
+          style={{ fontSize: '11px' }}
         />
         <YAxis 
-          label={{ value: 'Power (W)', angle: -90, position: 'insideLeft' }}
+          label={{ value: 'Power (W)', angle: -90, position: 'insideLeft', style: { fontSize: '12px' } }}
           stroke="#64748b"
+          style={{ fontSize: '11px' }}
         />
         <Tooltip 
           formatter={(value: number) => [`${value.toFixed(2)} W`, 'Power']}
