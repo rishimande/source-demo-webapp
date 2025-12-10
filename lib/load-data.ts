@@ -223,3 +223,128 @@ export function getMedianBatteryDipHour(windowStart: string, windowEnd: string):
   return dipHours[Math.floor(dipHours.length / 2)];
 }
 
+// ============================================================================
+// ENERGY & CARBON CREDIT CALCULATIONS
+// ============================================================================
+
+/**
+ * Calculate total energy generated for a given date range
+ * Uses trapezoidal integration of power readings over time
+ * 
+ * Assumption: Samples are approximately evenly spaced (~5 minutes apart)
+ * Energy (Wh) = Σ(Power_i × Δt) where Δt is the time interval in hours
+ */
+export function calculateEnergyForDateRange(startDate: string, endDate: string): number {
+  const samples = getDaylightHeartbeatForDateRange(startDate, endDate);
+  
+  if (samples.length === 0) return 0;
+  
+  // Sort samples by timestamp for accurate integration
+  const sortedSamples = [...samples].sort((a, b) => {
+    const timeA = new Date(a.heartbeat_ts).getTime();
+    const timeB = new Date(b.heartbeat_ts).getTime();
+    return timeA - timeB;
+  });
+  
+  let totalEnergyWh = 0;
+  
+  // Use trapezoidal integration
+  for (let i = 0; i < sortedSamples.length - 1; i++) {
+    const current = sortedSamples[i];
+    const next = sortedSamples[i + 1];
+    
+    // Calculate time difference in hours
+    const timeA = new Date(current.heartbeat_ts).getTime();
+    const timeB = new Date(next.heartbeat_ts).getTime();
+    const deltaHours = (timeB - timeA) / (1000 * 60 * 60);
+    
+    // Only count if samples are reasonably close (within 30 minutes)
+    // This avoids counting large gaps as continuous generation
+    if (deltaHours <= 0.5) {
+      // Trapezoidal rule: average power × time interval
+      const avgPower = (current.power_W_raw + next.power_W_raw) / 2;
+      totalEnergyWh += avgPower * deltaHours;
+    }
+  }
+  
+  return totalEnergyWh;
+}
+
+/**
+ * Calculate total energy generated across all available data
+ * Returns energy in MWh
+ */
+export function getTotalEnergyMWh(): number {
+  const dates = getAllDates();
+  if (dates.length === 0) return 0;
+  
+  const totalWh = calculateEnergyForDateRange(dates[0], dates[dates.length - 1]);
+  return totalWh / 1000000; // Convert Wh to MWh
+}
+
+/**
+ * Calculate average daily energy generation
+ * Returns energy in kWh
+ */
+export function getAverageDailyEnergyKWh(): number {
+  const dates = getAllDates();
+  if (dates.length === 0) return 0;
+  
+  const dailyEnergies: number[] = [];
+  
+  dates.forEach(date => {
+    const energyWh = calculateEnergyForDateRange(date, date);
+    if (energyWh > 0) {
+      dailyEnergies.push(energyWh / 1000); // Convert to kWh
+    }
+  });
+  
+  if (dailyEnergies.length === 0) return 0;
+  
+  return dailyEnergies.reduce((sum, e) => sum + e, 0) / dailyEnergies.length;
+}
+
+/**
+ * Get peak power across all days
+ * Returns power in Watts
+ */
+export function getPeakPowerW(): number {
+  const dates = getAllDates();
+  let maxPower = 0;
+  
+  dates.forEach(date => {
+    const samples = getDaylightHeartbeatForDate(date);
+    if (samples.length > 0) {
+      const dayMax = Math.max(...samples.map(s => s.power_W_raw));
+      maxPower = Math.max(maxPower, dayMax);
+    }
+  });
+  
+  return maxPower;
+}
+
+/**
+ * Get number of operating days (days with data)
+ */
+export function getOperatingDays(): number {
+  return getAllDates().length;
+}
+
+/**
+ * Get carbon credit statistics for the device
+ * Returns comprehensive data for the Energy Certificates component
+ */
+export function getCarbonCreditStats() {
+  const dates = getAllDates();
+  const dataPeriod = getDataPeriodRange();
+  
+  return {
+    totalEnergyMWh: getTotalEnergyMWh(),
+    avgDailyEnergyKWh: getAverageDailyEnergyKWh(),
+    operatingDays: getOperatingDays(),
+    projectStartDate: dataPeriod.min,
+    projectEndDate: dataPeriod.max,
+    peakPowerW: getPeakPowerW()
+  };
+}
+

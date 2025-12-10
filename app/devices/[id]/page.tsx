@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { DailyPowerChart } from '@/components/daily-power-chart';
 import { VerificationTable } from '@/components/verification-table';
 import { SevenDayEnvelopeChart } from '@/components/seven-day-envelope-chart';
+import { EnergyCertificates } from '@/components/energy-certificates';
 import { 
   getAllDates, 
   getDaylightHeartbeatForDate,
@@ -23,7 +24,8 @@ import {
   calculateSevenDayEnvelope,
   calculateHalfSineFit,
   findFilteredPeaks,
-  getMedianBatteryDipHour
+  getMedianBatteryDipHour,
+  getCarbonCreditStats
 } from '@/lib/load-data';
 import { DEVICE_NAME } from '@/lib/types';
 import { ArrowLeft } from 'lucide-react';
@@ -40,6 +42,7 @@ export default function DeviceDetailPage() {
   const dataPeriod = getDataPeriodRange();
   const allMetrics = getDailyMetrics();
   const sevenDayWindows = getSevenDayWindows();
+  const carbonStats = getCarbonCreditStats();
   
   // Get data for selected date
   const daylightSamples = getDaylightHeartbeatForDate(selectedDate);
@@ -196,7 +199,7 @@ export default function DeviceDetailPage() {
       
       {/* Tabs */}
       <Tabs defaultValue="daily" className="space-y-4 sm:space-y-6">
-        <TabsList className="grid w-full grid-cols-3 h-auto">
+        <TabsList className="grid w-full grid-cols-4 h-auto">
           <TabsTrigger value="daily" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
             <span className="hidden sm:inline">Daily Power</span>
             <span className="sm:hidden">Daily</span>
@@ -208,6 +211,10 @@ export default function DeviceDetailPage() {
           <TabsTrigger value="diagnostics" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
             <span className="hidden sm:inline">Verification Diagnostics</span>
             <span className="sm:hidden">Verify</span>
+          </TabsTrigger>
+          <TabsTrigger value="certificates" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+            <span className="hidden sm:inline">Energy Certificates</span>
+            <span className="sm:hidden">Credits</span>
           </TabsTrigger>
         </TabsList>
         
@@ -404,6 +411,18 @@ export default function DeviceDetailPage() {
               <VerificationTable metrics={allMetrics} />
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        {/* Tab 4: Energy Certificates */}
+        <TabsContent value="certificates" className="space-y-4 sm:space-y-6">
+          <EnergyCertificates
+            totalEnergyMWh={carbonStats.totalEnergyMWh}
+            avgDailyEnergyKWh={carbonStats.avgDailyEnergyKWh}
+            operatingDays={carbonStats.operatingDays}
+            projectStartDate={carbonStats.projectStartDate}
+            projectEndDate={carbonStats.projectEndDate}
+            peakPowerW={carbonStats.peakPowerW}
+          />
         </TabsContent>
       </Tabs>
     </div>
